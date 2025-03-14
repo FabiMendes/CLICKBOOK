@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro de Livro</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/cadastrar.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Cadastro de Livro</h1>
+        <form action="{{ url_for('livros.adicionar_livro') }}" method="POST">
+            <div class="input-group">
+                <label for="titulo">Título:</label>
+                <input type="text" id="titulo" name="titulo" required>
+            </div>
+            <div class="input-group">
+                <label for="autor">Autor:</label>
+                <input type="text" id="autor" name="autor" required>
+            </div>
+            <div class="input-group">
+                <label for="publicacao">Data de Publicação:</label>
+                <input type="date" id="publicacao" name="publicacao" required>
+            </div>
+            <div class="input-group">
+                <label for="tema">Tema:</label>
+                <input type="text" id="tema" name="tema" required>
+            </div>
+            <div class="input-group">
+                <label for="imagem">URL da Imagem:</label>
+                <input type="url" id="imagem" name="imagem" required>
+            </div>
+            <button type="submit" class="btn-submit">Cadastrar Livro</button>
+        </form>
+
+        <!-- Mensagens de sucesso ou erro -->
+        {% if mensagem %}
+        <div class="mensagem-sucesso">{{ mensagem }}</div>
+        {% endif %}
+        {% if erro %}
+        <div class="mensagem-erro">{{ erro }}</div>
+        {% endif %}
+    </div>
+</body>
+</html>

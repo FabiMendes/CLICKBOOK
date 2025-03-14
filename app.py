@@ -4,7 +4,6 @@ from routes.livrosRoutes import livros_blueprint
 
 app = Flask(__name__)
 
-
 @app.route("/", methods=["GET"])
 def home():
     return render_template("index.html")
@@ -12,6 +11,11 @@ def home():
 @app.route('/listar')
 def listar():
     return render_template('listar.html')
+
+@app.route('/cadastro')
+def cadastro():
+    return render_template('cadastro.html')
+
 
 app.register_blueprint(livros_blueprint)
 
