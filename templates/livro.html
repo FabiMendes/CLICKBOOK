@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <title>{{ livro.titulo }} - ClickBooks</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/livro.css') }}"
+    />
+  </head>
+  <body>
+    <div class="container-livro">
+      <div class="livro-imagem">
+        <img src="{{ livro.imagem }}" alt="Capa do livro {{ livro.titulo }}" />
+      </div>
+      <div class="livro-info">
+        <h2>{{ livro.titulo }}</h2>
+        <p><strong>Autor:</strong> {{ livro.autor }}</p>
+        <p><strong>Publicação:</strong> {{ livro.publicacao }}</p>
+        <p><strong>Tema:</strong> {{ livro.tema }}</p>
+        <p><strong>👍 Likes:</strong> {{ livro.likes }}</p>
+        <p><strong>👎 Dislikes:</strong> {{ livro.dislikes }}</p>
+        <br />
+
+
+        <!-- Formulário de aluguel -->
+        <form
+          method="POST"
+          action="{{ url_for('alugueis.rota_alugar_livro') }}"
+        >
+          <input type="hidden" name="titulo" value="{{ livro.titulo }}" />
+          <button type="submit" class="btn-alugar">Alugar</button>
+        </form>
+
+        <br /><br />
+        <a href="{{ url_for('front.listar') }}" class="btn-voltar"
+          >← Voltar para o menu</a
+        >
+      </div>
+    </div>
+  </body>
+</html>

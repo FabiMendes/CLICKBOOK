@@ -1,0 +1,88 @@
+body {
+  font-family: "Poppins", sans-serif;
+  background-color: #f4f4f4;
+  margin: 0;
+  padding: 40px 20px;
+}
+
+.container-livro {
+  display: flex;
+  max-width: 1000px;
+  margin: auto;
+  background-color: #ffffff;
+  border-radius: 12px;
+  padding: 30px;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+  flex-wrap: wrap;
+}
+
+.livro-imagem {
+  flex: 1 1 300px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.livro-imagem img {
+  width: 100%;
+  max-width: 300px;
+  height: auto;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.08);
+}
+
+.livro-info {
+  flex: 2 1 400px;
+  padding-left: 30px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.livro-info h2 {
+  margin-top: 0;
+  margin-bottom: 15px;
+  font-size: 28px;
+  color: #333;
+}
+
+.livro-info p {
+  margin: 8px 0;
+  font-size: 16px;
+  color: #555;
+}
+
+.btn-alugar {
+  margin-top: 30px;
+  padding: 12px 24px;
+  background-color: #4caf50;
+  color: white;
+  font-size: 16px;
+  font-weight: 500;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  width: fit-content;
+}
+
+.btn-alugar:hover {
+  background-color: #3e9143;
+}
+.btn-voltar {
+  margin-top: 15px;
+  padding: 10px 22px;
+  background-color: #555;
+  color: white;
+  font-size: 15px;
+  font-weight: 500;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.btn-voltar:hover {
+  background-color: #333;
+}

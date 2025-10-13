@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Meus Aluguéis</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/alugueis.css') }}"
+    />
+    <style>
+      .multa { color: red; font-weight: bold; margin-top: 5px; }
+      .avaliacao-item, .favorito-item { border: 1px solid #ccc; padding: 10px; margin-bottom: 10px; }
+      .aluguel-item { border: 1px solid #ddd; padding: 10px; margin-bottom: 10px; }
+      .aluguel-item img { max-width: 100px; margin-right: 10px; vertical-align: middle; }
+      .info { display: inline-block; vertical-align: middle; }
+      .avaliacao-item button, .favorito-item button { margin-right: 5px; }
+    </style>
+  </head>
+  <body>
+    <h1>Meus Aluguéis</h1>
+    <div id="alugueis-container"></div>
+
+    <!-- Container separado para favoritar -->
+    <div id="favoritar-container"></div>
+
+    <h2>Meus Favoritos</h2>
+    <div id="favoritos-container" class="alugueis"></div>
+
+    <script>
+      async function carregarAlugueis() {
+        try {
+          const response = await fetch("/alugueis/meus-alugueis");
+          const dados = await response.json();
+
+          const container = document.getElementById("alugueis-container");
+          container.innerHTML = "";
+          container.className = "alugueis";
+
+          dados.forEach((aluguel) => {
+            const div = document.createElement("div");
+            div.className = "aluguel-item";
+
+            const idLivro = aluguel.livro_id;
+
+            div.innerHTML = `
+              <img src="${aluguel.imagem}" alt="${aluguel.titulo}">
+              <div class="info"> 
+                <h3>${aluguel.titulo}</h3>
+                <p><strong>Data do Aluguel:</strong> ${aluguel.data_aluguel}</p>
+                <p><strong>Data de Devolução:</strong> ${aluguel.data_devolucao ?? "Não devolvido"}</p>
+                <p><strong>Status:</strong> ${aluguel.devolvido ? "Devolvido" : "Em posse"}</p>
+                ${aluguel.multa ? `<p class="multa">Multa por atraso na devolução: R$ 100,00</p>` : ""}
+                ${!aluguel.devolvido ? `<button onclick="devolverLivro(${aluguel.id}, ${idLivro}, '${aluguel.titulo.replace(/'/g, "\\'")}')">Devolver Livro</button>` : ""}
+              </div>
+            `;
+
+            container.appendChild(div);
+          });
+        } catch (erro) {
+          console.error("Erro ao carregar aluguéis:", erro);
+        }
+      }
+
+      async function devolverLivro(idAluguel, idLivro, titulo) {
+        if (!confirm("Tem certeza que deseja devolver este livro?")) return;
+
+        try {
+          const resposta = await fetch(`/alugueis/devolver/${idAluguel}`, { method: "POST" });
+
+          if (resposta.ok) {
+            alert("Livro devolvido com sucesso!");
+            mostrarOpcoesAvaliacao(idLivro, titulo);
+          } else {
+            const erro = await resposta.json();
+            alert("Erro ao devolver livro: " + erro.erro);
+          }
+        } catch (e) {
+          console.error("Erro ao enviar devolução:", e);
+          alert("Erro interno ao devolver livro.");
+        }
+      }
+
+      function mostrarOpcoesAvaliacao(idLivro, titulo) {
+        if (!idLivro) return console.error("idLivro indefinido!");
+
+        const container = document.getElementById("alugueis-container");
+        const div = document.createElement("div");
+        div.className = "avaliacao-item";
+
+        const h3 = document.createElement("h3");
+        h3.textContent = `Avalie o livro: ${titulo}`;
+        div.appendChild(h3);
+
+        const btnLike = document.createElement("button");
+        btnLike.textContent = "👍 Gostei";
+        btnLike.addEventListener("click", () => avaliarLivro(idLivro, 1, titulo));
+        div.appendChild(btnLike);
+
+        const btnDislike = document.createElement("button");
+        btnDislike.textContent = "👎 Não gostei";
+        btnDislike.addEventListener("click", () => avaliarLivro(idLivro, -1, titulo));
+        div.appendChild(btnDislike);
+
+        container.prepend(div);
+      }
+
+      function avaliarLivro(idLivro, avaliacao, titulo) {
+        if (!idLivro) return console.error("idLivro indefinido!");
+
+        fetch("/avaliacoes/avaliar", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id_livro: idLivro, avaliacao: avaliacao })
+        })
+        .then(r => r.json())
+        .then(dados => {
+          alert(dados.mensagem || dados.erro);
+
+          if (avaliacao === 1) { 
+            mostrarOpcoesFavorito(idLivro, titulo); 
+          }
+
+          carregarAlugueis();
+          carregarFavoritos();
+        })
+        .catch(err => console.error("Erro ao avaliar:", err));
+      }
+
+      function mostrarOpcoesFavorito(idLivro, titulo) {
+        if (!idLivro) {
+          console.error("ID do livro indefinido!");
+          return;
+        }
+
+        const container = document.getElementById("favoritar-container");
+        container.innerHTML = ""; // limpa qualquer favoritar anterior
+
+        const div = document.createElement("div");
+        div.className = "favorito-item";
+        div.innerHTML = `
+          <h3>Deseja favoritar este livro? ${titulo}</h3>
+          <button id="sim">Sim</button>
+          <button id="nao">Não</button>
+        `;
+        container.appendChild(div);
+
+        div.querySelector("#sim").addEventListener("click", () => {
+          favoritarLivro(idLivro);
+          div.remove();
+        });
+
+        div.querySelector("#nao").addEventListener("click", () => div.remove());
+      }
+
+      function favoritarLivro(idLivro) {
+        if (!idLivro) {
+          alert("ID do livro não definido!");
+          return;
+        }
+
+        fetch("/favoritos/adicionar", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id_livro: idLivro })
+        })
+        .then(r => r.json())
+        .then(dados => {
+          alert(dados.mensagem || dados.erro);
+          carregarFavoritos();
+        })
+        .catch(err => console.error("Erro ao favoritar:", err));
+      }
+
+      async function carregarFavoritos() {
+        try {
+          const response = await fetch("/favoritos/meus-favoritos");
+          const dados = await response.json();
+
+          const container = document.getElementById("favoritos-container");
+          container.innerHTML = "";
+
+          if (dados.length === 0) {
+            container.innerHTML = "<p>Nenhum favorito ainda.</p>";
+            return;
+          }
+
+          dados.forEach((livro) => {
+  const div = document.createElement("div");
+  div.className = "aluguel-item"; // mesmo card dos aluguéis
+  div.innerHTML = `
+    <img src="${livro.imagem}" alt="${livro.titulo}">
+    <div class="info">
+      <h3>${livro.titulo}</h3>
+    </div>
+  `;
+  container.appendChild(div);
+});
+        } catch (erro) {
+          console.error("Erro ao carregar favoritos:", erro);
+        }
+      }
+
+      carregarAlugueis();
+      carregarFavoritos();
+    </script>
+  </body>
+</html>

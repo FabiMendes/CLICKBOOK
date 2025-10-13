@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Login</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/login.css') }}"
+    />
+  </head>
+  <body>
+    <div class="container">
+      <h1>Login</h1>
+      {% if erro %}
+      <p class="mensagem-erro">{{ erro }}</p>
+      {% endif %}
+      <form action="{{ url_for('usuarios.logar') }}" method="POST">
+        <div class="input-group">
+          <label for="email">Email:</label>
+          <input type="text" id="email" name="email" required />
+        </div>
+        <div class="input-group">
+          <label for="senha">Senha:</label>
+          <input type="password" id="senha" name="senha" required />
+        </div>
+        <button type="submit" class="btn-submit">Entrar</button>
+      </form>
+      <p style="margin-top: 15px; font-size: 14px">
+        Não tem uma conta?
+        <a href="{{ url_for('usuarios.cadastro_usuario') }}"
+          >Cadastre-se aqui</a
+        >
+      </p>
+    </div>
+  </body>
+</html>
