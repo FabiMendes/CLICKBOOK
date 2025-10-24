@@ -9,8 +9,10 @@ from mysql.connector import errors
 def alugar_livro():
     try:
         if 'user' not in session:
+            print("[DEBUG] Tentativa de aluguel sem usuário autenticado")
             return "Usuário não autenticado.", 401
             
+        print(f"[DEBUG] Tentativa de aluguel - session['user']: {session.get('user')}")
         titulo_livro = request.form.get('titulo', '').strip()
         if not titulo_livro:
             return "Título do livro é obrigatório.", 400
@@ -41,6 +43,17 @@ def alugar_livro():
                 
                 if ja_alugado:
                     return "Este livro já está alugado.", 409
+
+                # Verifica se o usuário possui multas pendentes; se sim, bloqueia o aluguel
+                usuario_id = session['user']['id']
+                try:
+                    if Alugueis.usuario_tem_multas(usuario_id):
+                        return "Usuário possui multas pendentes. Empréstimo bloqueado.", 403
+                except Exception as e:
+                    # Em caso de erro ao verificar multas, abortamos a operação por segurança
+                    conexao.rollback()
+                    print(f"Erro ao verificar multas: {e}")
+                    return "Erro ao verificar multas do usuário.", 500
                 
                 cursor.execute("""
                     INSERT INTO alugueis 

@@ -26,11 +26,17 @@ app.config.update(
 )
 @app.route("/debug-session")
 def debug_session():
-    return {
+    from models.alugueis import Alugueis
+    session_info = {
         "session": dict(session),
         "cookies": request.cookies,
         "headers": dict(request.headers)
     }
+    if 'user' in session and 'id' in session['user']:
+        user_id = session['user']['id']
+        session_info['user_id'] = user_id
+        session_info['tem_multas'] = Alugueis.usuario_tem_multas(user_id)
+    return session_info
 
 
 app.register_blueprint(livros_blueprint)

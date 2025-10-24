@@ -1,4 +1,4 @@
-from config import conexao, cursor
+from config import conexao, cursor, conectar_bd
 from datetime import datetime, timedelta
 
 
@@ -127,3 +127,36 @@ class Alugueis:
         except Exception as e:
             print(f"Erro ao listar aluguéis do usuário: {e}")
             return []
+
+    @staticmethod
+    def usuario_tem_multas(usuario_id):
+        """Verifica se o usuário possui multas pendentes em empréstimos não devolvidos.
+
+        A regra de bloqueio é:
+        - Considera-se multa pendente quando existe um registro na tabela `alugueis`
+          com `usuario_id` igual, `multa = TRUE` e `devolvido = FALSE`.
+        """
+        # Use uma conexão local para garantir leitura consistente (evita usar um cursor global que pode ter estado diferente)
+        local_con = None
+        try:
+            local_con = conectar_bd()
+            if not local_con:
+                return False
+            local_cursor = local_con.cursor()
+            # Apenas multas sobre empréstimos ainda não devolvidos devem bloquear novos empréstimos
+            sql = "SELECT COUNT(*) FROM alugueis WHERE usuario_id = %s AND multa = TRUE AND devolvido = FALSE"
+            local_cursor.execute(sql, (usuario_id,))
+            res = local_cursor.fetchone()
+            local_cursor.close()
+            local_con.close()
+            if res:
+                return res[0] > 0
+            return False
+        except Exception as e:
+            print(f"Erro ao verificar multas do usuário: {e}")
+            try:
+                if local_con:
+                    local_con.close()
+            except:
+                pass
+            return False
