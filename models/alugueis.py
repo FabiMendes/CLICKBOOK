@@ -143,7 +143,7 @@ class Alugueis:
             if not local_con:
                 return False
             local_cursor = local_con.cursor()
-            # Apenas multas sobre empréstimos ainda não devolvidos devem bloquear novos empréstimos
+           
             sql = "SELECT COUNT(*) FROM alugueis WHERE usuario_id = %s AND multa = TRUE AND devolvido = FALSE"
             local_cursor.execute(sql, (usuario_id,))
             res = local_cursor.fetchone()

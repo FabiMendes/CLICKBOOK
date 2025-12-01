@@ -29,6 +29,13 @@
             <input type="text" id="temaPesquisa" placeholder="Pesquisar por gênero..."/>
             <button onclick="pesquisarTema()"><i class="fas fa-search"></i></button>
 
+            <form action="/usuarios/excluir-conta" method="POST" style="display:inline;">
+    <button type="submit"  class="btn-excluir"
+            onclick="return confirm('Tem certeza que deseja excluir sua conta?')">
+        X <span class="tooltip">Excluir conta</span>
+    </button>
+</form>
+
           </div>
           <!--NAVEGAÇÃO DA PÁGINA-->
           <nav>
@@ -351,6 +358,24 @@ window.addEventListener("scroll", () => {
   }
 
   ultimaPosicao = posicaoAtual;
-});
+  });
+
+  function excluirConta() {
+    const confirmar = confirm("Tem certeza que deseja excluir a sua conta?");
+    
+    if (confirmar) {
+        // Chama o backend para excluir
+        fetch('/excluir-conta', { method: 'POST' })
+            .then(response => response.json())
+            .then(data => {
+                alert("Sua conta foi excluída!");
+                window.location.href = "/login";
+            })
+            .catch(err => console.error(err));
+    } else {
+        alert("Exclusão cancelada.");
+    }
+}
+
   </script>
 </html>

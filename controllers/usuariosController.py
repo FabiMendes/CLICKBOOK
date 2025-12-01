@@ -71,8 +71,10 @@ def processar_login():
                 'email': email  # Opcional
             }
             session.modified = True
-            return redirect(url_for("usuario.html"))
+            # Após login, redireciona para a tela de listagem
+            return redirect(url_for('front.listar'))
         else:
             return render_template("login.html", erro="Usuário ou senha incorretos.")
     except Exception as e:
-        return render_template("usuario.html", erro=f"Erro no login: {str(e)}")
+        # Em caso de erro inesperado, mostra a tela de login com a mensagem de erro
+        return render_template("login.html", erro=f"Erro no login: {str(e)}")

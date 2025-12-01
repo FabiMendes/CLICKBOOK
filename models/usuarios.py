@@ -1,6 +1,12 @@
 from config import conexao, cursor
 from passlib.hash import bcrypt
+from flask import Blueprint
 
+usuarios_blueprint = Blueprint(
+    "usuarios_blueprint",
+    __name__,
+    url_prefix="/usuarios"   # AGORA SIM!
+)
 
 class Usuarios:
     def __init__(self, nome, telefone, email, senha, perfil):
@@ -94,3 +100,16 @@ class Usuarios:
         except Exception as e:
             print("Erro na autenticação:", e)
             return None
+
+    @staticmethod
+    def deletar_por_id(user_id):   #AGORA DENTRO DA CLASSE!!
+        try:
+            if conexao.is_connected():
+                sql = "DELETE FROM usuarios WHERE id = %s"
+                cursor.execute(sql, (user_id,))
+                conexao.commit()
+                return {"message": "Usuário excluído com sucesso!"}, 200
+            else:
+                return {"error": "Conexão não está ativa"}, 500
+        except Exception as e:
+            return {"error": str(e)}, 500

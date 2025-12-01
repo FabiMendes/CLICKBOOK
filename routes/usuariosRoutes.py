@@ -6,6 +6,8 @@ from controllers.usuariosController import (
     processar_login
 )
 from decorators.autenticacao import  somente_admin
+from decorators.autenticacao import login_required
+from models.usuarios import Usuarios
 
 usuarios_blueprint = Blueprint('usuarios', __name__, url_prefix='/usuarios')
 
@@ -76,3 +78,16 @@ def editar_perfil():
     conn.close()
 
     return redirect(url_for('usuarios.meu_espaco'))
+
+@usuarios_blueprint.route("/excluir-conta", methods=["POST"])
+@login_required
+def excluir_conta():
+    user_id = session["user"]["id"]
+
+    resultado, status = Usuarios.deletar_por_id(user_id)
+
+    if status == 200:
+        session.clear()
+        return redirect(url_for("front.login", msg="Sua conta foi excluída!"))
+    else:
+        return resultado, status

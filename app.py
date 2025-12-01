@@ -40,11 +40,11 @@ def debug_session():
 
 
 app.register_blueprint(livros_blueprint)
-app.register_blueprint(usuarios_blueprint)
 app.register_blueprint(alugueis_blueprint)
 app.register_blueprint(front_blueprint)
 app.register_blueprint(avaliacoes_blueprint)
 app.register_blueprint(favoritos_blueprint)
+app.register_blueprint(usuarios_blueprint)
 
 if __name__ == "__main__":
     app.run(debug=True)
